@@ -1,26 +1,18 @@
 import { createStore } from 'vuex';
 
-const store = createStore({
-  state() {
-    return {
-      loanApplication: null,
-    };
+export default createStore({
+  state: {
+    loans: [],
   },
   mutations: {
-    setLoanApplication(state, payload) {
-      state.loanApplication = payload;
+    setLoans(state, loans) {
+      state.loans = loans;
     },
   },
   actions: {
-    updateLoanApplication({ commit }, payload) {
-      commit('setLoanApplication', payload);
-    },
+    // placeholder for future actions
   },
   getters: {
-    getLoanApplication(state) {
-      return state.loanApplication;
-    },
+    allLoans: (state) => state.loans,
   },
 });
-
-export default store;

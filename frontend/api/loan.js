@@ -1,16 +1,12 @@
 import axios from 'axios';
+const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:8000';
 
-const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api', // Adjust to backend URL
-  timeout: 5000,
-});
+export async function applyLoan(data) {
+  const response = await axios.post(`${API_URL}/loans/apply`, data);
+  return response.data;
+}
 
-export const submitLoanApplication = async (data) => {
-  try {
-    const response = await apiClient.post('/loan-applications/', data);
-    return response.data;
-  } catch (error) {
-    console.error('Loan application submission error:', error);
-    throw error;
-  }
-};
+export async function getLoanStatus(appId) {
+  const response = await axios.get(`${API_URL}/loans/status/${appId}`);
+  return response.data;
+}

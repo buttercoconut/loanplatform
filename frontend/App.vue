@@ -1,11 +1,22 @@
 <template>
-  <router-view />
+  <div id="app">
+    <LoanApplicationForm />
+  </div>
 </template>
 
-<script setup>
-// Root component
+<script>
+import LoanApplicationForm from './components/LoanApplicationForm.vue';
+export default {
+  name: 'App',
+  components: { LoanApplicationForm },
+};
 </script>
 
 <style>
-/* Global styles can be added here */
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
 </style>
