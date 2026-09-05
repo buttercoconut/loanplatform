@@ -1,12 +1,12 @@
-import axios from 'axios';
-const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:8000';
+// API communication module using Axios
+import axios from 'axios'
 
-export async function applyLoan(data) {
-  const response = await axios.post(`${API_URL}/loans/apply`, data);
-  return response.data;
-}
+const apiClient = axios.create({
+  baseURL: process.env.VUE_APP_API_BASE_URL || 'http://localhost:8000',
+  timeout: 5000,
+})
 
-export async function getLoanStatus(appId) {
-  const response = await axios.get(`${API_URL}/loans/status/${appId}`);
-  return response.data;
+export async function applyLoan(payload) {
+  const response = await apiClient.post('/loans/apply', payload)
+  return response.data
 }

@@ -1,13 +1,11 @@
 from fastapi import FastAPI
-from .routes.loan_routes import router as loan_router
+from .routes import loan_routes
 
 app = FastAPI(title="Loan Platform API")
 
-app.include_router(loan_router)
+app.include_router(loan_routes)
 
-# Create tables on startup
-from .database.database import engine, Base
-
-@app.on_event("startup")
-async def startup_event():
-    Base.metadata.create_all(bind=engine)
+# Health check
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}

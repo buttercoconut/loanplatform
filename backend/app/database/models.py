@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, Float, String
-from . import db
+from sqlalchemy import Column, Integer, Float, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
-class LoanApplication(db.Base):
+Base = declarative_base()
+
+class LoanApplicationDB(Base):
     __tablename__ = "loan_applications"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -11,7 +14,5 @@ class LoanApplication(db.Base):
     income = Column(Float, nullable=False)
     debt_ratio = Column(Float, nullable=False)
     credit_score = Column(Integer, nullable=False)
-    status = Column(String, default="PENDING")
-    approved_amount = Column(Float)
-    interest_rate = Column(Float)
-    message = Column(String)
+    status = Column(String(20), default="PENDING")
+    created_at = Column(DateTime, default=datetime.utcnow)

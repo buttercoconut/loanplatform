@@ -1,73 +1,55 @@
+# Frontend Vue3 component for loan application form
 <template>
-  <div class="loan-form">
-    <h2>Loan Application</h2>
+  <div class="loan-application">
+    <h2>대출 신청</h2>
     <form @submit.prevent="submitForm">
-      <div>
-        <label>Applicant ID</label>
-        <input v-model.number="form.applicant_id" required />
-      </div>
-      <div>
-        <label>Loan Product ID</label>
-        <input v-model.number="form.loan_product_id" required />
-      </div>
-      <div>
-        <label>Amount</label>
-        <input v-model.number="form.amount" type="number" required />
-      </div>
-      <div>
-        <label>Income</label>
-        <input v-model.number="form.income" type="number" required />
-      </div>
-      <div>
-        <label>Debt Ratio</label>
-        <input v-model.number="form.debt_ratio" type="number" step="0.01" required />
-      </div>
-      <div>
-        <label>Credit Score</label>
-        <input v-model.number="form.credit_score" type="number" required />
-      </div>
-      <button type="submit">Apply</button>
+      <label>금액: <input v-model.number="form.amount" type="number" required /></label>
+      <label>기간(개월): <input v-model.number="form.termMonths" type="number" required /></label>
+      <label>연소득: <input v-model.number="form.annualIncome" type="number" required /></label>
+      <label>부채비율: <input v-model.number="form.debtToIncomeRatio" type="number" step="0.01" required /></label>
+      <label>신용점수: <input v-model.number="form.creditScore" type="number" required /></label>
+      <button type="submit">신청</button>
     </form>
-    <p v-if="message">{{ message }}</p>
+    <div v-if="response">
+      <h3>결과</h3>
+      <pre>{{ response }}</pre>
+    </div>
   </div>
 </template>
 
-<script>
-import { applyLoan } from "@/api/loan.js";
-export default {
-  name: "LoanApplicationForm",
-  data() {
-    return {
-      form: {
-        applicant_id: 0,
-        loan_product_id: 0,
-        amount: 0,
-        income: 0,
-        debt_ratio: 0,
-        credit_score: 0,
-      },
-      message: "",
-    };
-  },
-  methods: {
-    async submitForm() {
-      try {
-        const res = await applyLoan(this.form);
-        this.message = `Application submitted: ${JSON.stringify(res)}`;
-      } catch (e) {
-        this.message = `Error: ${e.response?.data?.detail || e.message}`;
-      }
-    },
-  },
-};
+<script setup>
+import { ref } from 'vue'
+import { applyLoan } from '@/api/loan'
+
+const form = ref({
+  amount: 0,
+  termMonths: 12,
+  annualIncome: 0,
+  debtToIncomeRatio: 0,
+  creditScore: 0,
+})
+const response = ref(null)
+
+async function submitForm() {
+  try {
+    const res = await applyLoan(form.value)
+    response.value = res
+  } catch (e) {
+    response.value = { error: e.message }
+  }
+}
 </script>
 
 <style scoped>
-.loan-form {
+.loan-application {
   max-width: 400px;
   margin: auto;
 }
-.loan-form div {
-  margin-bottom: 10px;
+label {
+  display: block;
+  margin-bottom: 8px;
+}
+button {
+  margin-top: 12px;
 }
 </style>

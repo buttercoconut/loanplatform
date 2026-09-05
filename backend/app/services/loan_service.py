@@ -1,33 +1,32 @@
-from sqlalchemy.orm import Session
-from ..models.loan_application_db import LoanApplicationDB
-from ..models.loan_application import LoanApplication
+# Domain service for loan approval logic
+from typing import Tuple
 
-class LoanService:
-    def __init__(self, db: Session):
-        self.db = db
+class LoanApprovalService:
+    def __init__(self, credit_score_threshold: int = 650, max_dti: float = 0.4):
+        self.credit_score_threshold = credit_score_threshold
+        self.max_dti = max_dti
 
-    def apply(self, app: LoanApplication) -> LoanApplication:
-        # Basic validation
-        if app.amount > app.income * 0.5:
-            return None
-        # Simulate credit check
-        if app.credit_score < 600:
-            return None
-        # Persist
-        db_app = LoanApplicationDB(
-            applicant_id=app.applicant_id,
-            loan_product_id=app.loan_product_id,
-            amount=app.amount,
-            income=app.income,
-            debt_ratio=app.debt_ratio,
-            credit_score=app.credit_score,
-            status="APPROVED",
-        )
-        self.db.add(db_app)
-        self.db.commit()
-        self.db.refresh(db_app)
-        return app
-
-    def get_status(self, app_id: int) -> str:
-        db_app = self.db.query(LoanApplicationDB).filter_by(id=app_id).first()
-        return db_app.status if db_app else None
+    def evaluate(self, amount: float, term_months: int, annual_income: float,
+                  debt_to_income_ratio: float, credit_score: int) -> Tuple[bool, float, float, str]:
+        """Return (approved, approved_amount, interest_rate, message)"""
+        # Basic checks
+        if credit_score < self.credit_score_threshold:
+            return False, 0.0, 0.0, "Credit score below threshold"
+        if debt_to_income_ratio > self.max_dti:
+            return False, 0.0, 0.0, "Debt-to-income ratio too high"
+        # Simple interest calculation
+        base_rate = 5.0  # base annual rate
+        # Adjust rate based on credit score
+        if credit_score >= 750:
+            base_rate -= 1.0
+        elif credit_score <= 650:
+            base_rate += 1.5
+        # Adjust rate based on term
+        if term_months > 60:
+            base_rate += 0.5
+        # Approved amount capped at 80% of income per month
+        max_approved = (annual_income / 12) * 0.8 * term_months
+        approved_amount = min(amount, max_approved)
+        if approved_amount <= 0:
+            return False, 0.0, 0.0, "Approved amount too low"
+        return True, approved_amount, base_rate, "Approved"
