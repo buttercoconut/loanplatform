@@ -1,1 +1,1 @@
-# Empty init
+# Empty __init__ for app package
