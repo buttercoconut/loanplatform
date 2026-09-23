@@ -1,32 +1,64 @@
-# Domain service for loan approval logic
-from typing import Tuple
+"""Business logic for loan application processing.
 
-class LoanApprovalService:
-    def __init__(self, credit_score_threshold: int = 650, max_dti: float = 0.4):
-        self.credit_score_threshold = credit_score_threshold
-        self.max_dti = max_dti
+The service layer contains the core decision‑making logic.  For the MVP we
+implement a very simple credit‑score based rule set.  In a real system this
+would be replaced by a call to an external credit‑rating service.
+"""
 
-    def evaluate(self, amount: float, term_months: int, annual_income: float,
-                  debt_to_income_ratio: float, credit_score: int) -> Tuple[bool, float, float, str]:
-        """Return (approved, approved_amount, interest_rate, message)"""
-        # Basic checks
-        if credit_score < self.credit_score_threshold:
-            return False, 0.0, 0.0, "Credit score below threshold"
-        if debt_to_income_ratio > self.max_dti:
-            return False, 0.0, 0.0, "Debt-to-income ratio too high"
-        # Simple interest calculation
-        base_rate = 5.0  # base annual rate
-        # Adjust rate based on credit score
-        if credit_score >= 750:
-            base_rate -= 1.0
-        elif credit_score <= 650:
-            base_rate += 1.5
-        # Adjust rate based on term
-        if term_months > 60:
-            base_rate += 0.5
-        # Approved amount capped at 80% of income per month
-        max_approved = (annual_income / 12) * 0.8 * term_months
-        approved_amount = min(amount, max_approved)
-        if approved_amount <= 0:
-            return False, 0.0, 0.0, "Approved amount too low"
-        return True, approved_amount, base_rate, "Approved"
+from __future__ import annotations
+
+from typing import Optional
+
+from sqlalchemy.orm import Session
+
+from ..models.loan_application import LoanApplication
+from ..models import Base
+from ..database.database import get_db
+
+
+class LoanService:
+    """Service class encapsulating loan‑application logic."""
+
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create_application(self, data) -> LoanApplication:
+        """Persist a new loan application and run initial review.
+
+        Parameters
+        ----------
+        data: pydantic model instance
+            The validated request payload.
+        """
+        application = LoanApplication(
+            customer_id=data.customer_id,
+            product_id=data.product_id,
+            amount=data.amount,
+            term_months=data.term_months,
+            income=data.income,
+            debt_ratio=data.debt_ratio,
+        )
+        self.db.add(application)
+        self.db.commit()
+        self.db.refresh(application)
+
+        # Run a simple credit check
+        self._run_credit_check(application)
+        return application
+
+    def _run_credit_check(self, application: LoanApplication) -> None:
+        """Very simple credit‑score simulation.
+
+        The rule set is:
+        * If debt_ratio > 0.4 -> reject
+        * If amount > 500_000 -> reject
+        * Otherwise approve
+        """
+        if application.debt_ratio > 0.4 or application.amount > 500_000:
+            application.status = "REJECTED"
+        else:
+            application.status = "APPROVED"
+        self.db.commit()
+
+    def get_application(self, app_id: int) -> Optional[LoanApplication]:
+        return self.db.query(LoanApplication).filter(LoanApplication.id == app_id).first()

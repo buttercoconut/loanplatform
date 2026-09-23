@@ -1,20 +1,18 @@
-# README.md for backend
+"""Project root README.
+
+Provides a quick start guide for the backend.
+"""
+
 # Loan Platform Backend
 
-This repository contains the FastAPI backend for the Loan Platform.
-
-## Setup
+## Quick Start
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Build the Docker image
+docker build -t loan-platform-backend .
 
-# Run the server
-uvicorn app.main:app --reload
+# Run the container
+docker run -p 8000:8000 loan-platform-backend
 ```
 
-## Testing
-
-```bash
-pytest
-```
+The API will be available at `http://localhost:8000`.

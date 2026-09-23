@@ -1,33 +1,38 @@
+"""FastAPI router for loan‑application endpoints.
+
+Only the minimal set of endpoints required for the MVP are implemented:
+
+* POST /applications – create a new loan application.
+* GET /applications/{id} – retrieve an existing application.
+"""
+
+from __future__ import annotations
+
 from fastapi import APIRouter, Depends, HTTPException, status
+
 from sqlalchemy.orm import Session
 
-from ..database.db import get_db
-from ..models.loan_application import LoanApplicationCreate, LoanApplicationResponse
-from ..services.loan_service import LoanApprovalService
+from ..database.database import get_db
+from ..models.loan_application import LoanApplicationOut
+from ..services.loan_service import LoanService
 
-router = APIRouter(prefix="/loans", tags=["loans"])
+router = APIRouter(prefix="/applications", tags=["Loan Applications"])
 
-approval_service = LoanApprovalService()
 
-@router.post("/apply", response_model=LoanApplicationResponse)
-async def apply_loan(request: LoanApplicationCreate, db: Session = Depends(get_db)):
-    # In real scenario, fetch customer and product from DB
-    # Here we just simulate
-    approved, amount, rate, msg = approval_service.evaluate(
-        amount=request.amount,
-        term_months=request.term_months,
-        annual_income=request.annual_income,
-        debt_to_income_ratio=request.debt_to_income_ratio,
-        credit_score=request.credit_score,
-    )
-    if not approved:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
-    # Persist application (simplified)
-    # Normally use ORM models; omitted for brevity
-    return LoanApplicationResponse(
-        application_id=1,
-        status="approved",
-        approved_amount=amount,
-        interest_rate=rate,
-        message=msg,
-    )
+@router.post("", response_model=LoanApplicationOut, status_code=status.HTTP_201_CREATED)
+async def create_application(
+    payload: LoanApplicationOut,
+    db: Session = Depends(get_db),
+):
+    service = LoanService(db)
+    application = service.create_application(payload)
+    return application
+
+
+@router.get("/{app_id}", response_model=LoanApplicationOut)
+async def get_application(app_id: int, db: Session = Depends(get_db)):
+    service = LoanService(db)
+    application = service.get_application(app_id)
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return application
