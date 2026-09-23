@@ -1,16 +1,18 @@
-# vite.config.js for frontend
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+"""
+Vite config.
+"""
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      '/api': {
+      '/loans': {
         target: 'http://localhost:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/loans/, ''),
       },
     },
   },
-})
+});

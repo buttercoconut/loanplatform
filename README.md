@@ -1,45 +1,51 @@
-# README for Loan Platform
+"""
+README for project.
+"""
+# Loan Platform
 
 ## Overview
-This repository contains a minimal loan application platform with a FastAPI backend and a Vue 3 frontend. The backend exposes endpoints for applying for a loan and checking application status. The frontend provides a simple form to submit loan applications.
+This repository contains a minimal online loan platform built with FastAPI (backend) and Vue3 (frontend). It demonstrates a clean architecture with hexagonal design, PostgreSQL persistence, and a simple loan approval algorithm.
 
-## Directory Structure
-```
-loanplatform/
-├─ backend/
-│  ├─ app/
-│  │  ├─ database/
-│  │  ├─ models/
-│  │  ├─ routes/
-│  │  ├─ services/
-│  │  ├─ main.py
-│  │  └─ tests/
-│  └─ Dockerfile
-├─ frontend/
-│  ├─ api/
-│  ├─ components/
-│  ├─ store/
-│  ├─ main.js
-│  └─ App.vue
-├─ docker-compose.yml
-└─ README.md
-```
+## Prerequisites
+- Docker & Docker Compose
+- Python 3.12+ (for local dev)
+- Node 20+ (for local dev)
 
-## Running Locally
+## Running locally
 ```bash
-# Build and start containers
 docker compose up --build
 ```
-The backend will be available at `http://localhost:8000` and the frontend at `http://localhost:5173`.
 
-## Testing
-Backend tests can be run with:
-```bash
-cd backend/app
-pytest
+Backend API will be available at `http://localhost:8000`.
+Frontend will be available at `http://localhost:5173`.
+
+## API Endpoints
+- `POST /loans/apply` – Submit a loan application.
+- `GET /health` – Health check.
+
+## Project Structure
+```
+backend/
+  app/
+    models/          # Pydantic & ORM models
+    routes/          # FastAPI routers
+    services/        # Business logic
+    database/        # DB connection
+  main.py
+  Dockerfile
+  requirements.txt
+frontend/
+  components/       # Vue components
+  api/              # Axios wrappers
+  router.js
+  store/
+  App.vue
+  Dockerfile
+  package.json
+  vite.config.js
 ```
 
 ## Notes
-- The backend uses SQLite for simplicity.
-- The frontend uses Vite and Vue 3.
-- API URL is configurable via `VUE_APP_API_URL`.
+- The loan approval logic is intentionally simple for demonstration.
+- In production, replace the algorithm with a robust credit scoring service.
+- Security features such as 2FA, encryption, and OWASP hardening are omitted for brevity.

@@ -1,11 +1,6 @@
-"""Requirements for the backend.
-
-Only the minimal set of packages needed for the MVP are listed.
-"""
-
+# requirements.txt
 fastapi
 uvicorn
-sqlalchemy
-psycopg2-binary
 pydantic
 pytest
+httpx

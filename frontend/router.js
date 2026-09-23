@@ -1,8 +1,11 @@
+"""
+Vue router.
+"""
 import { createRouter, createWebHistory } from 'vue-router';
-import LoanApplicationForm from '../components/LoanApplicationForm.vue';
+import LoanForm from '@/components/LoanForm.vue';
 
 const routes = [
-  { path: '/', name: 'Home', component: LoanApplicationForm },
+  { path: '/', component: LoanForm },
 ];
 
 const router = createRouter({

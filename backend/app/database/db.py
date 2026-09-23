@@ -1,8 +1,11 @@
-# Database connection using SQLAlchemy
+"""
+FastAPI database module using SQLAlchemy with PostgreSQL.
+"""
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/loan_db"
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg2://postgres:postgres@localhost:5432/loan_platform")
 
 engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

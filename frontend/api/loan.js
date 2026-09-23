@@ -1,12 +1,13 @@
-// API communication module using Axios
-import axios from 'axios'
+"""
+API wrapper using Axios.
+"""
+import axios from 'axios';
 
-const apiClient = axios.create({
-  baseURL: process.env.VUE_APP_API_BASE_URL || 'http://localhost:8000',
-  timeout: 5000,
-})
+const api = axios.create({
+  baseURL: process.env.VUE_APP_API_URL || 'http://localhost:8000',
+});
 
-export async function applyLoan(payload) {
-  const response = await apiClient.post('/loans/apply', payload)
-  return response.data
-}
+export const applyLoan = async (payload) => {
+  const response = await api.post('/loans/apply', payload);
+  return response.data;
+};
