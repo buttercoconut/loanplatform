@@ -1,1 +1,1 @@
-# Empty __init__ for app package
+# Backend package init
