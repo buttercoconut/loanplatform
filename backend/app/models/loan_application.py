@@ -1,8 +1,4 @@
-"""
-Pydantic models for API payloads.
-"""
 from pydantic import BaseModel, Field
-from datetime import datetime
 from typing import Optional
 
 class LoanApplicationCreate(BaseModel):
@@ -11,7 +7,7 @@ class LoanApplicationCreate(BaseModel):
     amount: float
     term_months: int
     income: float
-    debt: float
+    debt_ratio: float
     credit_score: int
 
 class LoanApplicationResponse(BaseModel):
@@ -19,7 +15,7 @@ class LoanApplicationResponse(BaseModel):
     status: str
     approved_amount: Optional[float] = None
     interest_rate: Optional[float] = None
-    created_at: datetime
+    message: Optional[str] = None
 
     class Config:
         orm_mode = True

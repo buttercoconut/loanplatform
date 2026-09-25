@@ -1,6 +1,6 @@
-# requirements.txt
+# requirements.txt for backend
 fastapi
 uvicorn
+sqlalchemy
+psycopg2-binary
 pydantic
-pytest
-httpx

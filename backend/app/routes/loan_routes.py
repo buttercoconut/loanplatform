@@ -1,21 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from ..database.database import get_db
-from ..models.schemas import LoanApplicationCreate, LoanApplicationOut
-from ..services.loan_service import LoanService
+from ..services import loan_service
+from ..models import loan_application as schema
+from ..database import get_db
 
 router = APIRouter(prefix="/loans", tags=["loans"])
 
-@router.post("/apply", response_model=LoanApplicationOut)
-def apply_loan(data: LoanApplicationCreate, db: Session = Depends(get_db)):
-    service = LoanService(db)
-    app = service.create_application(data.dict())
-    return app
-
-@router.get("/{app_id}", response_model=LoanApplicationOut)
-def get_loan(app_id: int, db: Session = Depends(get_db)):
-    service = LoanService(db)
-    app = service.get_application(app_id)
-    if not app:
-        raise HTTPException(status_code=404, detail="Application not found")
-    return app
+@router.post("/apply", response_model=schema.LoanApplicationResponse)
+def apply_loan(app: schema.LoanApplicationCreate, db: Session = Depends(get_db)):
+    return loan_service.evaluate_application(db, app)

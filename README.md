@@ -1,51 +1,38 @@
-"""
-README for project.
-"""
 # Loan Platform
 
-## Overview
-This repository contains a minimal online loan platform built with FastAPI (backend) and Vue3 (frontend). It demonstrates a clean architecture with hexagonal design, PostgreSQL persistence, and a simple loan approval algorithm.
+This repository contains the full source code for the Loan Platform application, including both backend (FastAPI) and frontend (Vue3) components.
 
-## Prerequisites
-- Docker & Docker Compose
-- Python 3.12+ (for local dev)
-- Node 20+ (for local dev)
+## Directory Layout
 
-## Running locally
-```bash
-docker compose up --build
+```
+loan-platform/
+├─ backend/          # FastAPI backend
+│  ├─ app/           # Application code
+│  │  ├─ models/     # Pydantic models
+│  │  ├─ routes/     # API endpoints
+│  │  ├─ services/   # Business logic
+│  │  ├─ database/   # DB connection
+│  │  └─ main.py     # FastAPI app
+│  ├─ tests/         # Unit tests
+│  ├─ Dockerfile
+│  ├─ requirements.txt
+│  └─ README.md
+├─ frontend/         # Vue3 frontend
+│  ├─ src/           # Source files
+│  │  ├─ api/        # Axios services
+│  │  ├─ components/ # Vue components
+│  │  ├─ views/      # Page components
+│  │  ├─ store/      # Vuex store
+│  │  ├─ router/     # Vue Router
+│  │  ├─ main.js
+│  │  └─ App.vue
+│  ├─ index.html
+│  ├─ vite.config.js
+│  ├─ package.json
+│  └─ README.md
+└─ README.md
 ```
 
-Backend API will be available at `http://localhost:8000`.
-Frontend will be available at `http://localhost:5173`.
+## Getting Started
 
-## API Endpoints
-- `POST /loans/apply` – Submit a loan application.
-- `GET /health` – Health check.
-
-## Project Structure
-```
-backend/
-  app/
-    models/          # Pydantic & ORM models
-    routes/          # FastAPI routers
-    services/        # Business logic
-    database/        # DB connection
-  main.py
-  Dockerfile
-  requirements.txt
-frontend/
-  components/       # Vue components
-  api/              # Axios wrappers
-  router.js
-  store/
-  App.vue
-  Dockerfile
-  package.json
-  vite.config.js
-```
-
-## Notes
-- The loan approval logic is intentionally simple for demonstration.
-- In production, replace the algorithm with a robust credit scoring service.
-- Security features such as 2FA, encryption, and OWASP hardening are omitted for brevity.
+Refer to the individual `README.md` files in the `backend` and `frontend` directories for setup instructions.

@@ -1,10 +1,20 @@
-"""
-Vue root component.
-"""
 <template>
-  <router-view />
+  <div id="app">
+    <LoanForm />
+  </div>
 </template>
 
 <script setup>
-// Empty
+import LoanForm from '@/components/LoanForm.vue'
 </script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>

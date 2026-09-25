@@ -1,18 +1,35 @@
-"""Project root README.
+# Backend
 
-Provides a quick start guide for the backend.
-"""
+This directory contains the FastAPI backend for the Loan Platform. It implements a simple loan application endpoint and a placeholder for loan review logic.
 
-# Loan Platform Backend
+## Directory Layout
 
-## Quick Start
+```
+backend/
+├─ app/
+│  ├─ models/
+│  │  └─ loan.py
+│  ├─ routes/
+│  │  └─ loan.py
+│  ├─ services/
+│  │  └─ loan.py
+│  ├─ database/
+│  │  └─ db.py
+│  └─ main.py
+├─ tests/
+├─ Dockerfile
+├─ requirements.txt
+└─ README.md
+```
+
+## Running the Backend
 
 ```bash
-# Build the Docker image
-docker build -t loan-platform-backend .
+# Install dependencies
+pip install -r requirements.txt
 
-# Run the container
-docker run -p 8000:8000 loan-platform-backend
+# Run the server
+uvicorn app.main:app --reload
 ```
 
 The API will be available at `http://localhost:8000`.

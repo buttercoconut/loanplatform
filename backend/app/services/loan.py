@@ -1,23 +1,37 @@
-import asyncio
+from sqlalchemy.orm import Session
+from ..database.models import LoanApplication
+from ..models.loan import LoanApplicationCreate, LoanApplicationResponse
 
-def calculate_credit_score(income: float, debt: float) -> int:
-    # Simple heuristic: higher income and lower debt -> higher score
-    ratio = debt / income if income else 1
-    if ratio < 0.2:
-        return 750
-    elif ratio < 0.4:
-        return 650
-    else:
-        return 550
+# Simple credit scoring logic
 
-async def process_application(app):
-    # Simulate async call to credit agency
-    await asyncio.sleep(0.1)
-    score = calculate_credit_score(app.income, app.debt)
-    app.credit_score = score
-    # Simple approval logic
-    if score >= 650 and app.amount <= app.income * 0.5:
-        app.status = "approved"
-    else:
-        app.status = "rejected"
-    return app
+def calculate_score(app: LoanApplicationCreate) -> int:
+    # Basic heuristic: higher income and lower loan amount -> higher score
+    income_factor = app.income / 10000
+    loan_factor = app.loan_amount / 10000
+    score = int(income_factor - loan_factor)
+    return max(0, min(100, score))
+
+def process_loan_application(db: Session, app: LoanApplicationCreate) -> LoanApplicationResponse:
+    # Persist application
+    db_app = LoanApplication(
+        name=app.name,
+        email=app.email,
+        income=app.income,
+        loan_amount=app.loan_amount,
+        loan_term_months=app.loan_term_months
+    )
+    db.add(db_app)
+    db.commit()
+    db.refresh(db_app)
+
+    # Calculate score and set status
+    score = calculate_score(app)
+    db_app.status = "APPROVED" if score >= 50 else "REJECTED"
+    db.commit()
+    db.refresh(db_app)
+
+    return LoanApplicationResponse(
+        id=db_app.id,
+        status=db_app.status,
+        created_at=db_app.created_at.isoformat()
+    )

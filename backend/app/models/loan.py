@@ -1,10 +1,20 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class LoanApplication(BaseModel):
+class LoanApplicationCreate(BaseModel):
     name: str
+    email: str
     income: float
-    debt: float
-    amount: float
-    credit_score: Optional[int] = None
-    status: str = "pending"
+    loan_amount: float
+    loan_term_months: int
+
+class LoanApplicationResponse(BaseModel):
+    id: int
+    status: str
+    created_at: str
+
+class LoanApplicationStatusResponse(BaseModel):
+    id: int
+    status: str
+    decision: Optional[str]
+    score: Optional[int]

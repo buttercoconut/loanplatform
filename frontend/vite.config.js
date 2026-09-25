@@ -1,18 +1,11 @@
-"""
-Vite config.
-"""
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
+# vite.config.js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
   server: {
-    proxy: {
-      '/loans': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/loans/, ''),
-      },
-    },
+    port: 5173,
+    open: true,
   },
-});
+})

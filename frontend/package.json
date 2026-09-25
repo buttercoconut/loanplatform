@@ -1,3 +1,4 @@
+# package.json for frontend
 {
   "name": "loan-platform-frontend",
   "version": "0.1.0",
@@ -5,12 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "preview": "vite preview"
   },
   "dependencies": {
     "axios": "^1.6.0",
     "vue": "^3.4.0",
-    "vue-router": "^4.2.0",
     "vuex": "^4.0.0"
   },
   "devDependencies": {

@@ -1,43 +1,61 @@
-# Business logic for loan approval
-from typing import Dict
-from .database import SessionLocal, LoanApplication, LoanProduct
+# Service layer for loan logic
+from ..models import loan_application as schema
+from ..database import get_db
+from sqlalchemy.orm import Session
+from . import credit_service
 
-# Simple scoring thresholds
-CREDIT_SCORE_THRESHOLD = 650
-INCOME_DEBT_RATIO_THRESHOLD = 0.4
+# Simple scoring algorithm
+
+def calculate_interest_rate(credit_score: int, debt_ratio: float) -> float:
+    base_rate = 0.05
+    if credit_score < 600:
+        base_rate += 0.05
+    elif credit_score < 700:
+        base_rate += 0.03
+    if debt_ratio > 0.4:
+        base_rate += 0.02
+    return base_rate
 
 
-def evaluate_application(app: LoanApplication) -> Dict[str, str]:
-    """Return decision and reason based on basic rules."""
-    product = app.product
-    # Check credit score
-    if app.credit_score < product.min_credit_score:
-        return {"status": "REJECTED", "reason": "Low credit score"}
-    # Check debt ratio
-    if app.debt_ratio > INCOME_DEBT_RATIO_THRESHOLD:
-        return {"status": "REJECTED", "reason": "High debt ratio"}
-    # Check amount vs max
-    if app.amount > product.max_amount:
-        return {"status": "REJECTED", "reason": "Amount exceeds product limit"}
-    # If all good
-    return {"status": "APPROVED", "reason": "All criteria met"}
-
-# Service wrapper
-class LoanService:
-    def __init__(self, db):
-        self.db = db
-
-    def create_application(self, data):
-        app = LoanApplication(**data)
-        self.db.add(app)
-        self.db.commit()
-        self.db.refresh(app)
-        # Evaluate immediately for MVP
-        decision = evaluate_application(app)
-        app.status = decision["status"]
-        self.db.commit()
-        self.db.refresh(app)
-        return app
-
-    def get_application(self, app_id: int):
-        return self.db.query(LoanApplication).filter(LoanApplication.id == app_id).first()
+def evaluate_application(db: Session, app: schema.LoanApplicationCreate) -> schema.LoanApplicationResponse:
+    # Basic validation
+    if app.amount <= 0 or app.term_months <= 0:
+        return schema.LoanApplicationResponse(
+            id=0,
+            status="REJECTED",
+            message="Invalid amount or term"
+        )
+    # Simulate credit check
+    credit_ok = credit_service.check_credit(app.customer_id, app.credit_score)
+    if not credit_ok:
+        return schema.LoanApplicationResponse(
+            id=0,
+            status="REJECTED",
+            message="Credit check failed"
+        )
+    # Calculate interest
+    rate = calculate_interest_rate(app.credit_score, app.debt_ratio)
+    approved_amount = app.amount * 0.9  # 10% down
+    # Persist
+    new_app = schema.LoanApplicationDB(
+        customer_id=app.customer_id,
+        product_id=app.product_id,
+        amount=app.amount,
+        term_months=app.term_months,
+        income=app.income,
+        debt_ratio=app.debt_ratio,
+        credit_score=app.credit_score,
+        status="APPROVED",
+        approved_amount=approved_amount,
+        interest_rate=rate
+    )
+    db.add(new_app)
+    db.commit()
+    db.refresh(new_app)
+    return schema.LoanApplicationResponse(
+        id=new_app.id,
+        status=new_app.status,
+        approved_amount=approved_amount,
+        interest_rate=rate,
+        message="Approved"
+    )

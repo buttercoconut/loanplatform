@@ -1,12 +1,11 @@
 from fastapi import FastAPI
-from .routes import loan_routes
+from app.routes.loan_routes import router as loan_router
 
 app = FastAPI(title="Loan Platform API")
 
-# Include routers
-app.include_router(loan_routes.router, prefix="/api/loans", tags=["Loans"])
+app.include_router(loan_router, prefix="/api/loans", tags=["loans"])
 
-# Root endpoint
-@app.get("/")
-async def read_root():
-    return {"message": "Welcome to the Loan Platform API"}
+# Health check
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
